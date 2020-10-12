@@ -10,11 +10,15 @@
 \usepackage[dvipdfmx]{hyperref}
 \usepackage{pxjahyper}
 \usepackage{comment}
-
+\makeatletter
+\renewcommand{\theequation}{%
+\thesection.\arabic{equation}}
+\@addtoreset{equation}{section}
+\makeatother
 \renewcommand{\refname}{参考文献}
-\newtheorem{theo}{定理}
-\newtheorem{ho}{補題}
-\newtheorem{defi}{定義}
+\newtheorem{theo}{定理}[section]
+\newtheorem{ho}{補題}[section]
+\newtheorem{defi}{定義}[section]
 
 \begin{document}
 
@@ -50,7 +54,8 @@
 \item $(\Omega,\mathcal{F},P)$：確率空間
 \item $H$：使う手法により異なる条件を満たす関数$f:\mathcal{X}\to\mathcal{Y}$の集合が為す可分ヒルベルト空間
 \item $L$：頻度論的手法における損失関数$H\times\Omega \to \mathbb{R}$
-
+\item $\nabla_f L(f,\omega),f\in H$：頻度論的手法における勾配の定義。$\omega$を固定した上でのフレシェ微分に$f$を代入したもの。
+\item $\mathcal{B}(A),A$は距離空間：ボレル集合族
 \item $\mathcal{P}((\Omega,\mathcal{F})$：可測空間$(\Omega,\mathcal{F})$上の確率測度全体の集合。$\mathcal{F}$を略記し、$\Omega$が距離空間である場合、$\mathcal{P}(\Omega)$は$\mathcal{P}((\Omega,\mathcal{B}(\Omega))$であるものとする。
 \item $\mathcal{R}$：リッジレット作用素
 \item $\mathcal{R}^*$:双対リッジレット作用素
@@ -108,8 +113,25 @@
 
 \subsubsection{損失関数}
 
+損失関数$L$と仮説空間$H$の組は次を満たす必要がある。
+\begin{defi} 許容可能な組み合わせ
+
+任意の$f\in H$に対して、フレシェ微分に$f$を代入した値$\nabla_fL(f)$が$H$に含まれる。
+\footnote{機械学習がある程度分かる方はこの定義を「勾配法で更新した結果、モデルの枠組みをはみ出した関数になったら困るから」と理解していただければわかりやすいでしょう。もうちょっと拡張できますが、めんどくさすぎるし、普通に使われてる実アルゴリズムは全部この条件を満たすのでこれで行きます。}
+\end{defi}
+
+
+
+
+
 
 次の定理は関数解析的定義と、実際のアルゴリズムを結ぶ超重要定理である。
+
+\begin{theo}フレシェ微分はユークリッド空間における勾配の拡張
+
+$H$が有限次元ユークリッド空間$\mathbb{R}^N$と同型であるとき、フレシェ微分はユークリッド空間の勾配$\nabla_\theta,\theta\in\mathbb{R}^N$と一致する。
+
+\end{theo}
 
 \subsection{ベイズ論的機械学習問題の定義}
 
