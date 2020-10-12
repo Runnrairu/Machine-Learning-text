@@ -9,6 +9,8 @@
 \usepackage{wrapfig}
 \usepackage[dvipdfmx]{hyperref}
 \usepackage{pxjahyper}
+\usepackage{comment}
+
 \renewcommand{\refname}{参考文献}
 \newtheorem{theo}{定理}
 \newtheorem{ho}{補題}
@@ -43,10 +45,18 @@
  \clearpage
 \section*{notation}
 \begin{itemize}
-\item $(\Omega,\mathcal{F},P)$:確率空間
-\item $H$:可分ヒルベルト空間
-\item $L$:損失関数$H\to \mathbb{R}$
+\item $\mathcal{X}$：特徴量空間。$\mathbb{R}^d$の単連結な開部分集合
+\item $\mathcal{Y}$：ラベル空間。$\mathbb{R}^n$もしくは$\mathbb{C}^n$
+\item $(\Omega,\mathcal{F},P)$：確率空間
+\item $H$：使う手法により異なる条件を満たす関数$f:\mathcal{X}\to\mathcal{Y}$の集合が為す可分ヒルベルト空間
+\item $L$：頻度論的手法における損失関数$H\times\Omega \to \mathbb{R}$
 
+\item $\mathcal{P}((\Omega,\mathcal{F})$：可測空間$(\Omega,\mathcal{F})$上の確率測度全体の集合。$\mathcal{F}$を略記し、$\Omega$が距離空間である場合、$\mathcal{P}(\Omega)$は$\mathcal{P}((\Omega,\mathcal{B}(\Omega))$であるものとする。
+\item $\mathcal{R}$：リッジレット作用素
+\item $\mathcal{R}^*$:双対リッジレット作用素
+\item $D_{ucp}$：ucp位相の入ったc\'{a}dl\'{a}gな適合過程の集合。（すなわち発展的可測）
+\item $L_{ucp}$：同上。ただし上が確率積分の定義域であるのに対して、こちらは値域。確率過程として動いている空間が違ったりする。
+\item $N$：ポアソンランダム測度
 \end{itemize}
 
 
@@ -71,14 +81,45 @@
 \subsection{前提知識}
 本資料において、入門編の前提知識は「学部レベルの解析学」（主に関数解析とルベーグ積分）、発展編はその都度必要な知識を補完されたし。
 
+確率解析は基本的に[1]の流儀を使用する。\footnote{数か月前まで無駄に難解なだけの読みにくい本だと思っていましたが、変な確率過程の研究をしだすとこんなにありがたい既存理論は他にないと分かります。この本がなかったら、私がここ４か月で出したの成果と同じ研究成果を出すのに３年くらいかかってそう。「ucp位相の入った適合c\'{a}dl\'{a}g過程空間」の確率解析理論がそこそこ完成されてる事実があまりに便利すぎる。}
+
 
 \newpage
 
 \section{入門：機械学習の一般的問題設定}
 
+この章では、機械学習の問題設定について、関数解析的に定義する。
+
+\begin{defi} データの定義
+
+多数の特徴量とラベルの組、$\{(x_i,y_i)\}_i\subset \mathcal{X}\times \mathcal{Y}$をデータと呼ぶ。
+
+\end{defi}
+
+\subsection{頻度論的機械学習問題の定義}
+
+
+
+\subsubsection{仮説空間}
+
+特徴量空間からラベル空間への写像のうち、手法によってことなる条件を満たすものが為す可分ヒルベルト空間$H$を仮説空間と呼ぶ。この$H$の中から、なるべく良い$f$を選ぶのが、機械学習問題の目的である。
+
+
+
+\subsubsection{損失関数}
+
+
+次の定理は関数解析的定義と、実際のアルゴリズムを結ぶ超重要定理である。
+
+\subsection{ベイズ論的機械学習問題の定義}
+
+
+
+
+
 \newpage
 \begin{thebibliography}{99}
-  \bibitem{キー} 
+  \bibitem{キー}  P. Protter, Stochastic Integration and Differential Equations, Applications of Mathematics, Second edition, Vol. 21 (Springer-Verlag, Berlin, 2005).
 \end{thebibliography}
 
 \end{document}
