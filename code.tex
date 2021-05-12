@@ -9,6 +9,7 @@
 \usepackage{wrapfig}
 \usepackage[dvipdfmx]{hyperref}
 \usepackage{pxjahyper}
+\usepackage{ascmac}
 \usepackage{comment}
 \makeatletter
 \renewcommand{\theequation}{%
@@ -19,6 +20,7 @@
 \newtheorem{theo}{定理}[section]
 \newtheorem{ho}{補題}[section]
 \newtheorem{defi}{定義}[section]
+\newtheorem{pro}{問}[section]
 
 \begin{document}
 
@@ -28,7 +30,7 @@
   \vspace{15mm}
   \Huge 一般的\footnote{ここで言う「一般的な」とは、「普通の人にもわかりやすい」という意味ではなく、数学界隈における「汎用性の高い」「広く対応可能な定義を導入している」という意味である。}な機械学習入門\par
   \vspace{90mm}
-  \Large 最終更新：2020年10月11日 \par
+  \Large 最終更新：2021年5月12日 \par
   \Large 逢空れい@ranoiaru\par
 
 \end{center}
@@ -50,7 +52,7 @@
 \section*{notation}
 \begin{itemize}
 \item $\mathcal{X}$：特徴量空間。$\mathbb{R}^d$の単連結な開部分集合
-\item $\mathcal{Y}$：ラベル空間。$\mathbb{R}^n$もしくは$\mathbb{C}^n$
+\item $\mathcal{Y}$：ラベル空間。$\mathbb{R}^n$もしくは$\mathbb{C}^n$か、それらの上での確率測度の集合
 \item $(\Omega,\mathcal{F},P)$：確率空間
 \item $H$：使う手法により異なる条件を満たす関数$f:\mathcal{X}\to\mathcal{Y}$の集合が為す可分ヒルベルト空間
 \item $L$：頻度論的手法における損失関数$H\times\Omega \to \mathbb{R}$
@@ -71,11 +73,12 @@
 深夜テンションによる出来心で「数学徒向けの機械学習入門書を書いたら見てくれる人ふぁぼください。ふぁぼ多かったら実行します」と書いたら、なんか一晩で500以上ふぁぼられたうえ、なぜか200近くフォロワーが増えたのでやらざるを得ない。
 
 \subsection{本書執筆の経緯（よまなくてもいいよ）}
+
 本書の構想は三年前に遡る。当時私は機械学習に入門したばかりの修士課程学生だったが、その時に触れた書籍があまりに数学的厳密性にも一般性にも欠け、そのことに対する苛立ちをツイートにぶつけた。
 
 その結果、燃えた。
 
-クソリプと暴言の嵐で通知が埋まり、私はしばらく鍵垢に籠った。
+通知が埋まり、私はしばらく鍵垢に籠った。
 
 私の言い方も大いに悪かったのだが、あまりにも曲解されすぎではないかと当時の私は思ったものである。あの発言の意図としては、インターン時のパワハラ面接官や、twitterのひたすらマウントをとってくる某エンジニアに対して「数学ろくに知らないくせに『数学なんて機械学習に無意味』なんていうんじゃない」ということであり、断じて「純粋数学に明るくなきゃ本当に機械学習わかってるとは言えない」などということではない。誓ってもいい。
 
@@ -83,13 +86,25 @@
 
 機械学習界隈を騒がせてからちょうど三年。私も学生時代が終わり、数学寄りの機械学習研究者として仕事をしながら、修士時代の研究室へ社会人博士への入学をもくろむ日々。ツイートがバズったのもなにかの縁であろう。変な書き方のせいで不快な思いをさせてしまった方々へのお詫びも兼ねて、ここはひとつ、数学徒向け機械学習入門書の執筆を行うことにした。
 
+(2020/10/12)
+
 \subsection{前提知識}
-本資料において、入門編の前提知識は「学部レベルの解析学」（主に関数解析とルベーグ積分）、発展編はその都度必要な知識を補完されたし。
+本資料において、入門編の前提知識は「学部レベルの解析学」（主に関数解析とルベーグ積分,
+確率論）、発展編はその都度必要な知識を補完されたし。
 
 確率解析は基本的に[1]の流儀を使用する。\footnote{数か月前まで無駄に難解なだけの読みにくい本だと思っていましたが、変な確率過程の研究をしだすとこんなにありがたい既存理論は他にないと分かります。この本がなかったら、私がここ４か月で出したの成果と同じ研究成果を出すのに３年くらいかかってそう。「ucp位相の入った適合c\'{a}dl\'{a}g過程空間」の確率解析理論がそこそこ完成されてる事実があまりに便利すぎる。}
 
+\subsection{無料版と有料版}
+後に本書はbooth等で販売する予定です。有料版は論文公開直後の最先端研究の解説や、確率論・統計学の基礎からマリアヴァン解析まで数学の簡易的な解説も付属します。投げ銭感覚でもいいので買ってくださると非常にありがたいです。価格は1万円未満にはします。
+
+また、有料版発売後、githubで公開しているこの無料版は、よほどのミスや重大な数学的誤り以外修正しないので、ご了承ください。有料版は発見次第なるべく早く修正します。\footnote{boothは一度購入すれば制限なく新バージョン落とせます。}
+
 
 \newpage
+
+
+
+
 
 \section{入門：機械学習の一般的問題設定}
 
@@ -97,9 +112,19 @@
 
 \begin{defi} データの定義
 
-多数の特徴量とラベルの組、$\{(x_i,y_i)\}_i\subset \mathcal{X}\times \mathcal{Y}$をデータと呼ぶ。
+多数の特徴量とラベルの組、$\mathcal{D}_t:=\{(X_i,Y_i)\}_i\subset \mathcal{X}\times \mathcal{Y}$を時刻$t$のデータと呼ぶ。
+
+また、データ観測前のσ加法族を$\mathcal{F}_0$、データ$\mathcal{D}_t$観測後のσ加法族を$\mathcal{F}_t$と呼ぶ。
+
 
 \end{defi}
+\begin{defi} 推定量
+$\mathcal{F}_t$可測な確率変数のことを推定量という。
+\end{defi}
+
+データは$\mathcal{D}_1$一つだけのこともあれば、$\mathcal{D}_1,\mathcal{D}_2,......,$と時系列に渡って増え続けることもある。
+
+推定量とは要するに「その時刻の情報で計算可能な数値」である。
 
 \subsection{頻度論的機械学習問題の定義}
 
@@ -116,14 +141,11 @@
 損失関数$L$と仮説空間$H$の組は次を満たす必要がある。
 \begin{defi} 許容可能な組み合わせ
 
-任意の$f\in H$に対して、フレシェ微分に$f$を代入した値$\nabla_fL(f)$が$H$に含まれる。
-\footnote{機械学習がある程度分かる方はこの定義を「勾配法で更新した結果、モデルの枠組みをはみ出した関数になったら困るから」と理解していただければわかりやすいでしょう。もうちょっと拡張できますが、めんどくさすぎるし、普通に使われてる実アルゴリズムは全部この条件を満たすのでこれで行きます。}
+任意の$f\in H$に対して、フレシェ微分に$f$を代入した値$\nabla_fL(f,\omega)$が確率１で$H$に含まれる。
+\footnote{実アルゴリズムやその無限次元化等はすべて問題ないので、この条件を意識せずとも別に構わないのですが、非線形変換かつ線形変換を自明に含まない無限次元の仮説空間という非常に病的な機械学習問題を設定する場合に必要になってきます。重箱の隅を突くなんてレベルじゃない話ですが、問題設定は可能な限り一般的に書きたいのでこんな条件が出てくる。}
 \end{defi}
 
-
-
-
-
+$L(f,\omega)$は$\mathcal{F}_1$可測な確率変数である。つまりデータがあってはじめて計算できる。
 
 次の定理は関数解析的定義と、実際のアルゴリズムを結ぶ超重要定理である。
 
@@ -133,15 +155,612 @@ $H$が有限次元ユークリッド空間$\mathbb{R}^N$と同型であるとき
 
 \end{theo}
 
-\subsection{ベイズ論的機械学習問題の定義}
+この関数解析学における基本的な定理により、本書の定義が実アルゴリズムの一般化であると言うことができる。
+
+\subsubsection{更新則}
+
+初期値関数$f_0\in H$を乱数等によって決定したうえで、この関数は次のように更新されていく。\footnote{$f_0$の決定方法は手法等により様々なテクニックが存在します。}
+
+\begin{align}
+f_{n+1}:=f_n-\alpha_n \nabla_f L(f,\omega)
+\end{align}
+
+$\{\alpha_n\}$の列を学習率といい、$1e-4$など小さめの数に設定される。後述の焼きなまし法やロビンスモンロー条件等により、数値が下がっていく場合も多い。
+
+この更新を繰り返す行為を「学習」と呼び、$n\to \infty$で$argmin_{f\in H} E[L(f,\omega)]$となる$f$に収束することが示されているのが望ましい。\footnote{本当は解析的に$argmin_{f\in H} E[L(f,\omega)]$を計算できるのが望ましいですが、そのような状況はまずありません。}
+
+\subsection{}
+
+\begin{itembox}[l]{機械学習とはなんなのか}
+機械学習とは、AIとは、この特徴量とラベルの関係を記述する関数$f:\mathcal{X}\to \mathcal{Y}$の関数が我々の観測不能な領域に存在すると考え、真の$f$をデータや様々な手法によって手元のコンピューター上に「近似」する手法である。
+\end{itembox}
+
+強化学習などの例外を踏まえるといささか乱暴な物言いであるが、初学者や機械学習を数理的に捉えなおしたい方はまずはこの認識を持ってほしい。
 
 
+\subsection{ベイズ論的問題設定}
+
+本書においてはあまりベイズ論には触れるつもりがないが、せっかくの問題設定なのでベイズ論にも応用しておく。
+
+\begin{defi} 頻度論とベイズ論
+
+$\mathcal{Y}$が$\mathbb{C}^n$or$\mathbb{R}^n$であるとき、この機械学習問題を頻度論的機械学習問題という。
+
+$\mathcal{Y}$が$\mathbb{C}^n$or$\mathbb{R}^n$を台に持つ確率測度の集合であるとき、これをベイズ論的機械楽手問題という。
+
+$\mathcal{Y}$が有限集合上の測度であるとき、頻度論かベイズ論かは事前分布の仮定を置くかによる。
+
+\end{defi}
+
+$\mathcal{X}$から確率測度の台$\mathbb{C}^n$or$\mathbb{R}^n$への写像の集合で、適当なヒルベルト空間に制限したものを$\tilde{H}$とおく
+
+頻度論ではただ一つ真の$f$が存在すると考えたが、必ずしもそうではないと考えるのがベイズ論である。
+
+$\tilde{H}$上に値を取る確率変数$B(\omega)(f)$を考える。当然この分布はデータとは独立ではない。
+
+$B$の$\mathcal{F}_0$条件付き分布を事前分布\footnote{データを見る前に知っている情報等から構成される。}、$\mathcal{F}_1$条件付き分布を事後分布という。\footnote{データを見たあとの分布です}
+
+\begin{theo} ベイズの定理
+
+$B$の$\mathcal{F}_t$条件付き分布を$\mu_t$と置くと
+
+\begin{align}
+d\mu_1(g) =\frac{\mathcal{L}(\mathcal{D}_1|g)d\mu(g)}{\int_H \mathcal{L}(\mathcal{D}_1|g')d\mu_0(g')}
+\end{align}
+
+\end{theo}
+
+これを用いて、ベイズ推論による$f$は次のように構成される。
+
+\begin{defi} 予測分布
+
+ベイズ推定による$f$を構成する。$\mathcal{Y}$の台上の測度$f(x)$を、$x$に対するラベルの予測分布という。
+
+\begin{align}
+df(x)(y):=\int_H 1_{g(x)=y}  d\mu_1(g)
+\end{align}
+
+\end{defi}
+
+要するに、ラベル空間の代わりにラベル空間上の測度をラベルと見做すのがベイズ論である。この考え方は、本書終盤の部分観測マルコフ決定過程と共通する。
+
+これは謂わば最尤推定のベイズ化と言えるが、後の様々な頻度論的手法もベイズ化が可能である。具体的にどのような構成になるかは、あまりに記述が煩雑になり読者を置いてけぼりにしすぎるため、興味のある方のみ取り組んでほしい。
+
+相当関数解析力が鍛えられるし、後の強化学習の章ではとんでもなく複雑な関数解析を乱用するため、良い練習にもなるだろう。
+
+
+\subsection{損失関数の構成例}
+
+ここでは、$L$の具体的な構成について、例を交えつつ解説する。
+
+損失関数は基本的に経験損失項と正則化項に分けられる。
+
+
+\subsubsection{経験損失}
+
+回帰問題においては、平均二乗誤差という概念を用いる。
+
+二乗誤差とはその名の通り誤差の二乗で$|f(X)-Y|^2$とすることで計算できる。この期待値を求めたい。$X$はi.i.dサンプリングであるため、$X$の出やすさの分布を$dp_X(x)$という測度で表現するとすると、
+
+\begin{align}
+E[|f(X)-Y|^2]&=\int_\mathcal{X}|f(x)-y|^2dp_X(x)\\
+&=\frac{1}{|\mathcal{D}|}\sum_{X_i,Y_i\in \mathcal{D}} |f(X_i)-Y_i|^2　（モンテカルロ近似）
+\end{align}
+
+期待値を計算する際はモンテカルロ法であるため、データの数が多いほど近似制度が良くなる。
+
+
+次に分類問題について。こちらは基本的に$\mathcal{Y}$が有限集合でありを台に持つ確率測度の隔たり\footnote{回帰問題はただのユークリッド距離でしたが、こちらは距離の公理を満たさないので距離ではありません。そのため「距離」ではなく「へだたり」と書きます。}を測る。
+
+台となる有限集合を$\tilde{\mathcal{Y}}$と置き、データ$Y$はラベル$i$が正解であるとき、$Y=(0,......,1,......0)$(i番目の成分のみ１で残りが０)と表記することにする。有限集合上の確率測度のベクトル表記である。
+
+近似する関数$f$は$x$を受け取り$\tilde{\mathcal{Y}}$上の測度を返す。これを用いて、「正解ラベルに対して何パーセントの確率を返したか」で損失を測る。正解ラベルが５のとき、ラベル５である確率を６０％と判定した場合と、40％と判定した場合では、当然後者のほうが損失が多くなる。
+
+この計算には対数$-\log{p}$を用いる。$p=1$つまり100％そのラベルが正解であると判定しているなら、損失は０となる。
+
+\begin{align}
+E[\sum_{j\in\tilde{\mathcal{Y}}} -Y_{\cdot_j} \log{f(X)(j)}]&=\int_\mathcal{X} \sum_{j\in\tilde{\mathcal{Y}}} -Y_{\cdot_j} \log{f(X)(j)}dp_{X}(x)\\
+&=-\sum_i\in\mathcal{D} \sum_{j\in\tilde{\mathcal{Y}}} -Y_{i_j} \log{f(X)(j)}
+\end{align}
+
+この測度同士の隔たりの計算方法をクロスエントロピー誤差と言う。
+
+\begin{pro}
+これらの損失関数のベイズ版を考察せよ。
+\end{pro}
+
+
+\subsubsection{正則化}
+
+突然だが、ここで数列クイズである。
+
+\begin{align}
+0,3,8,15,24,35,
+\end{align}
+
+と来た時、次の数字はなんだろうか。
+
+賢明な読者なら、$a_n=n^2-1$とすぐに気づき、48と答えるだろう。しかし、本当にそれだけだろうか。
+
+例えば$n^1938576-34567n^35244+......$といったトンデモ式で表現される可能性は考えられないだろうか。
+
+しかし、誰もが$n^2-1$が正しそうだと考える。これは「オッカムの剃刀」と呼ばれる考え方で、「どうせ事象が表現可能なら、単純な構造の方が正しそう」という考え方だ。
+
+これを実現するために、$f$の複雑さそのものを「損失」と考え、経験損失と足し合わせる。これが正則化である。
+
+代表的なものはRidge正則化とLosso正則化である。
+
+\begin{itemize} 
+\item Ridge正則化:$||f||^2_H$
+\item Losso正則化 $H$がユークリッド空間であるとき、マンハッタン距離$|\theta_1|+|\theta_2|+|\theta_3|+......$と計算する
+\end{itemize}
+
+Lossoはパラメータが疎になりやすい（0になるパラメータが多い）というメリットがあり、Ridge正則化は非常に数学的に扱いやすいメリットがある。本書では特に表記なき場合正則化と言えばRidge正則化である。
+
+他にも、原点周りのみ線形で原点から離れたら2乗するいいとこどりの手法も存在する。
+
+正則化項は上記項を0.0001倍など小さな数を掛けて（正則化率という）経験損失に足し合わせる。
+
+$H$がユークリッド空間と同型であるとき、これは「大きなパラメータをなるべく使わない」ということである。特にRidge回帰では、「コンパクト集合外では原点に押し戻す作用がパラメータの大きさに線形に働く」\footnote{2次なので勾配を計算すると線形オーダーになります。}という性質が、GLD等のエルゴード性の考察において非常に重要になって来る。
+
+\subsection{機械学習の具体的な問題設定}
+損失関数の構成を踏まえて、有名な機械学習問題等を本書定義に当てはめていく。
+
+
+
+
+\subsubsection{具体例1:線形回帰（フルバッチ）}
+
+上記の定義をもとに、決定論的なフルバッチの線形回帰は次のように書ける。
+
+\begin{align}
+\mathcal{X}:&=\mathbb{R}^d\\
+\mathcal{Y}:&=\mathbb{R}\\
+\mathcal{H}:&=\{f:\mathcal{X}\to\mathcal{Y},f(x)=\sum^J_{j=0}a_j\phi_j(x),a_j\in\mathbb{R},\phi_j:=x^j\}\\
+L(f):&=\frac{1}{n}\sum^n_{i=1}|y_i-f(x_i)|^2
+\end{align}
+
+ここで、$J,N,\alpha$は使用者自らが決定する変数で、「ハイパーパラメータ」と呼ばれる。
+
+$\mathcal{H}$は$\mathbb{R}^{J+1}$と同型
+
+\subsubsection{具体例2:線形回帰（確率的勾配法）}
+\begin{align}
+\mathcal{X}&:=\mathbb{R}^d\\
+\mathcal{Y}&:=\mathbb{R}\\
+\mathcal{H}&:=\{f:\mathcal{X}\to\mathcal{Y},f(x)=\sum^J_{j=0}a_j\phi_j(x),a_j\in\mathbb{R},\phi_j:=x^j\}\\
+L(f,\omega)&:=\frac{1}{|I(\omega)|}\sum_{i\in I(\omega)}|y_i-f(x_i)|^2
+\end{align}
+$I(\omega)\subset \mathcal{D}$はランダムに抽出してきたデータの一部で、確率空間$(\Omega_1,\mathcal{F}_1,P_1)$上で定義されるものとする。
+
+\subsubsection{具体例3:カーネル回帰（フルバッチ）}
+$\mathcal{X}:=\mathbb{R}^d,\mathcal{Y}:=\mathbb{R}$と定める。あらかじめ正定値性を満たすカーネル関数$k:\mathcal{X}^2\to\mathcal{Y}$を定めておく。
+
+\begin{align}
+\mathcal{H}&:=\mathcal{H}_k\\
+L(f)&:=\frac{1}{n}\sum_{i\in I(\omega)}|y_i-f(x_i)|^2
+\end{align}
+
+
+\subsubsection{具体例4:浅いニューラルネット（回帰）}
+\begin{align}
+\mathcal{X}:&=\mathbb{R}^d\\
+\mathcal{Y}:&=\mathbb{R}\\
+\mathcal{H}:&=\{f:\mathcal{X}\to\mathcal{Y},f(x)=W_2\eta(W_1x-b_1)-b_2\phi_j(x),W_1\in\mathbb{R}^{L\times d},W_2\in \mathbb{R}^{1\times L},b_1\in\mathbb{R}^L,b_2\in\mathbb{R}\}\\
+L(f):&=\frac{1}{n}\sum^n_{i=1}|y_i-f(x_i)|^2
+\end{align}
+
+ただし$\eta:\mathbb{R}^L\to\mathbb{R}^L$は活性化関数と呼ばれ、あらかじめ定めておいた非線形でLipsitz連続な関数$\sigma:\mathbb{R}\to\mathbb{R}$を用いて
+\begin{align}
+\eta_i(z):&=\sigma(z_i)
+\end{align}
+として定義される。
+
+
+
+\subsubsection{具体例5:浅いニューラルネット（分類）}
+分類したいクラスの集合である有限集合$C=\{c^{(1)},c^{(2)},......,c^{(m)}\}$に対して、データ$\tilde{\mathcal{D}}=\{x_i,c_i\}^n_{i=1}$が存在している状況で、新たな$x$に対してどのクラスに属するかを予測する。
+
+$\mathcal{X}:=\mathbb{R}^d,\mathcal{Y}:=\mathbb{R}^m$とおき、成形されたデータ$\mathcal{D}:=\{x_i,y_i\}^n_{i=1}$を次のように定義する。
+
+\begin{align}
+y_{ij}:=\begin{cases}
+    1(c_i=c^{(j)})\\
+    0(else)
+\end{cases}
+\end{align}
+
+このうえで、$\mathcal{H},L$は次のように定義される。
+
+
+\begin{align*}
+\mathcal{H}:&=\{g:\mathcal{X}\to\mathcal{Y},f(x)=softmax(g(x)),g(x)=W_2\eta(W_1x-b_1)-b_2\phi_j(x),\\ 
+&W_1\in\mathbb{R}^{L\times d},W_2\in \mathbb{R}^{1\times L},b_1\in\mathbb{R}^L,b_2\in\mathbb{R}\}\\
+L(f):&=-\frac{1}{n}\sum^n_{i=1}\sum^m_{j=1}y_{ij}\log{f(x_i)_j}
+\end{align*}
+
+この損失関数は交差エントロピーと呼ばれ、$C$上の確率測度間の乖離度合いを表す距離のようなもの（距離の公理は満たさない）
+
+新たな入力データ$x$に対して、$c_{\hat{i}},\hat{i}=argmax_i f(x)$を予測されるクラスとする。
+
+
+\subsubsection{具体例6:深いニューラルネット（回帰）}
+ここでは中間層がN層の場合を扱う。
+
+基本的には具体例4と同じで、$\mathcal{H}$のみが異なる。
+\begin{align}
+\mathcal{H}:&=\{f:\mathcal{X}\to\mathcal{Y},f(x)=V_{end}g_K\circ g_{K-1}\circ......\circ g_1(x)-b_{end},g_i(x)=\eta(W_ix-b_i)\}
+\end{align}
+
+
+
+
+
+また、自然数列$L:=\{L_1,......,L_K\}$を用いて、$L_0=d$とおくと
+\begin{align}
+W_i\in \mathbb{R}^{ L_i\times L_{i-1}}\\
+b_i\in \mathbb{R}^{L_i}\\
+W_{end}\in\mathbb{R}^{1\times L_K}\\
+b_{end}\in\mathbb{R}
+\end{align}
+
+$K=1$のとき、上記の浅いニューラルネットと等しくなる。
+
+$K>1$のとき、このようなニューラルネットによる学習を「深層学習」という。
+
+
+\subsubsection{具体例7:ResNet}
+近年主流になりつつある、深層学習の亜種である。ここでは本書で使用する定義を書く。
+
+
+具体例7,8においては、$T\in(0,\infty)$に対して、有限個の数列$t_0=0<t_1<......<t_{K-1}<t_K=T$を用いて
+
+\begin{align}
+V_t=V_{t_i} (t\in[t_i,t_{i+1}))
+\end{align}
+
+とする。$W,b^1,b^2$についても同様。具体例9,10においてはその限りではない。
+
+この状況下で
+
+\begin{align}
+\frac{dX^i_t}{dt}=g(t,X^i_t)\\
+X^i_0=x_i
+\end{align}
+
+と置き、終端値$X_T$をさらに処理し分類する関数$h$(CNNにおいてはプーリング層と全結合層の合成となる)を用いて損失$L(f),f:=h\bigotimes g$は、フルバッチの回帰問題の場合
+
+\begin{align}
+L(f):=\frac{1}{n}\sum^n_{i=1}|y_i-h(X^i_T)|^2
+\end{align}
+
+と定義される。
+
+損失関数の値は各データに対する損失の平均と考えることができ$L^{(i)}(f):=\tilde{L}(x_i,f):=|y_i-h(X^i_T)|^2$という関数を用いて
+
+\begin{align}
+L(f):=\frac{1}{n}\sum^n_{i=1} L^{(i)}(f)
+\end{align}
+
+と書き直せる。ここで4章で重要になる終端値関数を定義する。
+
+\begin{defi} 終端値関数
+
+
+終端値関数$F:\mathbb{R}^d\to\mathbb{R}$を次のように定義する。
+
+\begin{align}
+F(X^i_T):=|y_i-h(X^i_T)|^2
+\end{align}
+
+
+\end{defi}
+
+これは要するに「時系列flowの終端から出力までの関数と、（世間一般で言うところの）損失関数の合成関数」と考えればよい。
+
+実際のところ、明らかに次の等式が成り立つ。
+
+\begin{align}
+L(f)=\frac{1}{n}\sum^n_{i=1} F(X^i_T)
+\end{align}
+
+ミニバッチ法、分類問題、そして具体例8,9,10の場合も同様に定義する。
+
+損失関数をこう置き換えると、ResNetやSDEnetといった時系列flowモデルに対して、非常に数学的解析がしやすくなる。そのため4章では$L$ではなく$F$を用いて様々な解析を行う。
+
+
+
+
+\subsubsection{具体例8:StochasticDepth}
+確率空間$(\Omega_2,\mathcal{F}_2,P_2)$上で定義された、ベルヌーイ分布に従う独立な確率変数列$b_1,b_2,......,b_N$を考える。ただし各$b_i$の確率分布はあらかじめ定められた写像$p$を用いて$p(i)\in(0,1)$に従う。
+\begin{align}
+x_{i+1}=x_{i}+b_i f(i,x_i)
+\end{align}
+という形で定義する。
+
+ここで、もしミニバッチなら$(\Omega,\mathcal{F},P):=(\Omega_1,\mathcal{F}_1,P_1)\bigotimes(\Omega_2,\mathcal{F}_2,P_2)$とおく。
+
+\subsubsection{具体例9:ODENet}
+\begin{align}
+\mathcal{H}&=\{f:\mathcal{H}_1\times\mathcal{H}_2\to\mathbb{Y},f(x)=h_{ab}(x_T)\}\\
+\mathcal{H}_1&=\{h:\mathbb{T}\times\mathcal{X}\to\mathcal{X},h(t,x)=V_t\eta(W_tx-b^1_t)-b_t^2\\
+\mathcal{H}_2&=\{h_{ab}:\mathcal{X}\to\mathcal{Y},h_{ab}(x)=V_{ab}\eta(W_{ab}x-b^1_{ab})-b^2_{ab}\}
+\end{align}
+
+ただし、$x_0:=x,x_t:=\int^t_0 h(s,x_s)ds$とおく。
+
+\subsubsection{具体例10:SDENet}
+本修士論文の主題である。上記のODEnetを確率化する。
+\begin{align}
+\mathcal{H}&=\{f:\mathcal{H}_1\times\mathcal{H}_2\to\mathbb{Y},f(x)=h_{ab}(X_T)\}\\
+\mathcal{H}_1&=\{h:\mathbb{T}\times\mathcal{X}\to\mathcal{X},h_1(t,x)=V_t\eta(W_tx-b^1_t)-b_t^2,h_2=V^2_t\eta(W^2_tx-b^{12}_t)-b_t^{22}\}\\
+\mathcal{H}_2&=\{h_{ab}:\mathcal{X}\to\mathcal{Y},h_{ab}(x)=V_{ab}\eta(W_{ab}x-b^1_{ab})-b^2_{ab}\}
+\end{align}
+ただし、$X_0=x$であり、$X$は$dX_t=h_1(t,X_t)dt+h_2(t,X_t)dB_t$という確率微分方程式に従うものとする。
+
+確率空間は$(\Omega,\mathcal{F},P):=(\Omega_1,\mathcal{F}_1,P_1)\bigotimes(B,\mathcal{B}(B),\mu)$と置く。ただし$(B,\mathcal{B}(B),\mu)$は$B:=C([0,T])$とした場合のWiener空間である。$h_1,h_2$が$x$に対して大域的Lipschitz連続で$t$に対して$1/2$次Hölder連続と置くことで、$X_T\in\mathbb{D}^\infty$となる。つまり$X_T$がWiener汎関数と言え、上記の定義での損失関数が定義でき、またMalliavin微分や部分積分の議論に持ち込める。
+
+
+
+\subsection{活性化関数の具体例}
+上述の$\sigma(x)$について、一応大域的Lipsitz連続で非線形であればなんでもいいことになっているが、当然よく使われるものは存在する。
+
+\subsubsection{ReLu}
+\begin{align}
+\sigma(x):=max(0,x)
+\end{align}
+と定義される。「if文一つで書ける」「勾配が消失しない」といった利点がある。
+
+区分的に滑らかな関数を近似するにあたってこの形が都合がいいとする研究もある
+
+本書では連続的に微分可能ではないこと、零点がLebesgue測度無限大に存在すること、区分的に微分しても2階微分が零関数になることなどから6章1項を除いて採用しない。
+
+\subsubsection{swish}
+\begin{align}
+\sigma(x):=x\cdot sigmoid(x)\\
+sigmoid(x):=\frac{1}{1+e^{-x}}
+\end{align}
+近年Reluにとって代わって使われ始めている活性化関数。原点から離れるほどReluに近づく。
+
+$C^\infty$であること、任意の階数の導関数も含めて零点がLebesgue測度0であることなどから、準楕円性などを考察する状況おいては非常に都合がよく、原則こちらを用いることにする。
+
+\newpage
+\section{入門：ニューラルネットの積分表現理論}
+
+\subsection{ニューラルネットの連続化}
+
+特徴量空間$\mathcal{X}(:=\mathbb{R}^d)$から、$\mathbb{C}$への写像を構成する浅いニューラルネット考える。
+
+\begin{align}
+f(x)=W_2\eta(W_1x-b_1)
+\end{align}
+
+
+ただし、$W_2$は$1\times J$複素行列、$W_1$は$J\times d$実行列、$b_1$は$J$次元実ベクトルであるとする。
+
+また$\eta:\mathbb{R}^J\to\mathbb{C}^J$であり、ある非線形で大域的リプシッツ連続な写像$\sigma:\mathbb{R}\to\mathbb{C}$を用いて,$\eta_i(y)=\sigma(y_i)$と書けるとする。
+
+
+この計算をベクトル$a\in\mathbb{R}^d,b\in\mathbb{R},\sigma,c\in\mathbb{C}$を用いて書き直す
+\begin{align}
+f(x)=\sum^J_{i=1}c_i\sigma(a_i\cdot x-b_i)
+\end{align}
+
+ここで、$J\to\infty$とした形
+
+\begin{align}
+f(x)=\int_{\mathbb{R}^{d+1}}\gamma(a,b)\sigma(a_i\cdot x-b_i)dadb
+\end{align}
+
+これを積分的ニューラルネットと呼ぶ。積分的ニューラルネットに対しては、正則化付き損失関数に対する大域的最適解が解析的に求められる場合がある。そのため、十分広いニューラルネットに対して、最適なパラメータの近似値が一回の数値計算で求められることになる。
+
+
+
+この章では、特徴量空間上の測度$\mu$（データの分布）と、それに対して後の許容条件を満たすように自由に設定できる測度パラメータ空間上の測度$\lambda$を扱えるようにするため、[2]で提唱された再生核Hilbert空間上のRidgelet解析を[3]による再生核Hilbert空間の理論により我流の再構成を行う。
+
+\subsection{再生核Hilbert空間上の積分表現理論}
+
+$\mathcal{X}$上の複素数値関数全体の集合を$\mathcal{F}(\mathcal{X})$とおく。
+
+パラメータ$a,b$の成す空間$\mathbb{R}^{d+1}$から$\mathbb{C}$への写像のうち、$\mathbb{R}^{d+1}$上の測度$\lambda(dadb)$による$L^2$空間を$\mathcal{G}(:=L^2(\mathbb{R}^{d+1}\to\mathbb{C},\lambda(dadb)))$とおく。
+
+写像$h:\mathcal{X}\to\mathcal{G}$を固定し、次のような積分作用素$S:\mathcal{G}\to\mathcal{F}(\mathcal{X})$を、$F\in\mathcal{G}$に対して、$f=SF$となる$f\in\mathcal{F}(\mathcal{X})$を、次の等式が成り立つ関数とすることによって定義する。
+\begin{align}
+f(x)=\langle F,h(x)\rangle_\mathcal{G}
+\end{align}
+
+ここで、$S$の像空間$\mathcal{E}(S):=S(\mathcal{G})$に対して、次のようにノルムを入れる。
+\begin{align}
+||f||_{\mathcal{E}(S)}:=inf\{||F||_\mathcal{G}:SF=f\}
+\end{align}
+
+
+\begin{theo} 再生核Hilbert空間([3])
+
+$k:\mathcal{X}^2\to\mathbb{C}$を次のように定義する。
+
+\begin{align}
+k(x,y):=\langle h(y),h(x)\rangle_\mathcal{G}
+\end{align}
+
+この時、$\mathcal{E}(S)$は再生核$k$を持つ再生核Hilbert空間
+
+$\{h(x),x\in\mathcal{X}\}$が$\mathcal{G}$上完全であることと、$S$が等距離写像であることは同値
+
+\end{theo}
+
+今後、この$\mathcal{E}(S)$を、再生核Hilbert空間であることを強調するために$H_k$と表記する。
+
+\begin{theo} 等距離元の存在([3])
+
+任意の$f\in H_k$に対し
+\begin{align}
+||f||_{H_k}=||F^*||_\mathcal{G}
+\end{align}
+を満たす$F^*\in\mathcal{G}$が一意に存在する
+\end{theo}
+
+この$F^*$を$f$のRidgelet変換と呼び、$\mathcal{R}f$と表記する。
+
+今後、定数$K$を$\mathcal{X}$上の測度$\mu$を用いて,$K:=\int_\mathcal{X}k(x,x)\mu(dx)$と表記する。
+
+$0<K<\infty$の時、この$(\mu,\lambda,h)$の組は「許容条件を満たす」と呼ぶ。
+
+\begin{theo} 積分作用素の連続性
+
+$(\mu,\lambda,h)$が許容条件を満たすとき、$H_k\subset L^2(\mathcal{X},\mu)$であり、$S:\mathcal{G}\to L^2(\mathcal{X},\mu)$は連続作用素
+
+proof.
+
+$H_k$上の関数列$\{u_j\}^\infty_{j=1}$を、$\mathcal{G}$の正規直交基底$\{v_j\}^\infty_{j=1}$を用いて
+
+\begin{align}
+u_j(x):=\langle v_j ,h(x)\rangle_\mathcal{G}
+\end{align}
+
+と定義する。両辺の$L^2(\mathcal{X},\mu)$上のノルムを取る。
+
+\begin{align}
+||u_j||^2_{L^2(\mathcal{X},\mu)}&=\int_\mathcal{X} u_j(x)\overline{u_j}(x) d\mu(x)\\
+&=\int_\mathcal{X}(\int_{\mathbb{R}^{d+1}} v_j(z)\overline{h(x)(z)}d\lambda(z)\overline{\int_{\mathbb{R}^{d+1}} v_j(z)\overline{h(x)(z)}d\lambda(z)} )d\mu(x)\\
+&\leq \int_\mathcal{X}(\int_{\mathbb{R}^{d+1}} v_j(z)\overline{v_j(z)}d\lambda(z)\int_{\mathbb{R}^{d+1}} h(x)(z)\overline{h(x)(z)}d\lambda(z) )d\mu(x) (Schwarzの不等式)\\
+&= K||v_j||^2_\mathcal{G}
+\end{align}
+
+$u_j=Sv_j$であることを踏まえると、任意の$F\in\mathcal{G}$は$\{v_j\}^\infty_{j=1}$の線形和で書けるため、同じ議論により
+
+\begin{align}
+||SF||_{L^2(\mathcal{X},\mu)}\leq K||F||_\mathcal{G}
+\end{align}
+
+となる。$f\in H_k$にはすべて$f=SF$となる$F$が存在するため、定理の主張が言える。
+\end{theo}
+
+許容条件に加え、$\{h(x):x\in\mathcal{X}\}$が$\mathcal{G}$上完全であるとき、「強い意味で許容条件を満たす」と呼ぶとする。
+
+\begin{theo} $H_k$の正規直交基底
+
+強い許容条件が満たされるとき、$\{u_j\}^\infty_{j=1}$は$H_k$の正規直交基底
+
+proof.
+
+上記の定理より、$||f||_{H_k}=||F^*||_\mathcal{G}$となる$F^*$が存在し、また内積の線形性から、複素数列$\{c_j\}^\infty_{j=1},\sum |c_j|^2<\infty$を用いて
+
+\begin{align}
+F^*=\sum_j c_j v_j\\
+f=\sum_j c_j u_j
+\end{align}
+
+と書ける。強い許容条件が満たされる場合、$S$は等距離写像。そのため$f=u_j$としたとき$F^*=v_j$である。
+
+一般の$f,F^*$に対して、Parsevalの等式より$||F^*||_\mathcal{G}=\sum |c_j|^2$で、これは$||f||_{H_k}$と一致する。
+
+分極公式により$H_k$の内積は$||\cdot ||_{H_k}$から陽に書け、$\langle u_j ,u_i\rangle=\delta_{ij}$が言える。
+
+\end{theo}
+
+次はさらに強い条件を課す。この定理の条件を緩めていくことこそが、我々の再定義した積分表現理論における今後の課題となる。
+
+\begin{theo} Ridgelet変換の積分表示定理([3])
+
+$(\mu,\lambda,h)$は強い意味で許容条件を満たし、さらに任意の$f\in H_k$に対して$||f||_{H_k}=||f||_{L^2(\mathcal{X},\mu)}$が成り立つとする。
+
+また、単調増大な$\mathcal{X}$の部分集合列$\{E_N\}^\infty_{N=1}$を、$\cup^\infty_{N=1} E_N=\mathcal{X}$となるようにとり
+
+\begin{align}
+(\mathcal{R}_Nf)(z):=\int_{E_N} f(x) \overline{h(x)(z)}\mu(dx)
+\end{align}
+
+と置く、任意の$N$に対して$F_N\in\mathcal{G}$なら
+
+\begin{align}
+||\mathcal{R}_Nf-\mathcal{R}f||_\mathcal{G}\to 0(N\to\infty) 
+\end{align}
+\end{theo}
+
+この定理によって$F^*$はまさに既存のRidgelet変換そのもので、既存研究は$\mu(dx)=dx$と置いた場合であることがわかる。
+
+今回の再定義の利点は、$\mu$をデータの分布とすることで、よりデータに沿った形でRidgelet変換を定義できることにある。
+
+実問題では、有限個のデータ$(x_i,y_i)^n_{i=1}$から、なるべく"良い"写像$y=f(x)$を構成したい。既存のRidgelet解析では、このRidgelet変換を近似するにあたって
+
+\begin{align}
+(\mathcal{R} f)(a,b):&=\int_{\mathbb{R}^d} f(x)\sigma(a\cdot x-b)dx\\
+&\approx \frac{1}{n}\sum^n_{i=1} f(x_i)\sigma(a\cdot x_i-b)\\
+&\approx \frac{1}{n}\sum^n_{i=1} y_i\sigma(a\cdot x_i-b)
+\end{align}
+
+とするしかない。しかしこの近似は積分の測度がLebesgue測度である場合は不自然な近似となっている。実際のデータは一様分布には程遠く、一様に近い分布になるようデータの一部を抽出するのは、$d$が大きい状況では非常に難しい。
+
+ここで$dx$を特徴量データの分布$\mu(x)$に差し替えれば、上記の近似計算はモンテカルロ法として非常に自然なものとなる。
+
+
+
+\subsection{(先端研究)定義域の制限}
+
+Reluは実装が楽で計算も早いが、簡単に爆発するため扱いにくい。\footnote{厳密には爆発を抑えてくれない。}
+
+[4]では
 
 
 
 \newpage
+
+\section{残差学習の微分方程式解釈}
+
+\subsection{微分方程式と深層学習}
+
+
+\subsection{発展：マリアヴァン解析を用いた勾配誤差収束定理}
+
+
+\newpage
+\section{最適化アルゴリズムとエルゴード性}
+
+\subsection{様々な勾配法アルゴリズム}
+
+
+
+\subsection{発展：SDEのエルゴード性と最適化アルゴリズムが非凸損失関数の大域的最適解に確率収束する条件}
+
+
+\subsection{発展：（先端研究）現実的な計算時間で1epoch走らせられ、かつ非凸損失関数であっても大域的最適解に確率収束するアルゴリズム発見に向けた今後の課題}
+
+\newpage
+
+\section{強化学習と確率制御}
+著者の今の飯の種である。
+\subsection{マルコフ決定過程}
+
+
+
+\subsection{発展：部分観測マルコフ決定過程}
+
+
+
+
+\subsection{発展：分布型強化学習}
+
+
+\subsection{発展：統一理論・超一般化マルコフ決定過程}
+本当はこちらの定義を先に書いて、上記3定義はすべてこの特別な場合と言おうとしたが、強化学習初学者相手だといくら数学徒向けとはいえ鬼畜すぎるので最後に表記する。
+
+
+\subsection{（有料版限定）発展：（先端研究）レヴィ過程に基づく連続時間強化学習}
+著者の研究テーマである。
+
+\newpage
+\section{（有料版限定）：本書で用いられている数学の概説}
+
+
+
+\newpage
+\newpage
 \begin{thebibliography}{99}
   \bibitem{キー}  P. Protter, Stochastic Integration and Differential Equations, Applications of Mathematics, Second edition, Vol. 21 (Springer-Verlag, Berlin, 2005).
+  \bibitem{キー}   Sho Sonoda, Isao Ishikawa, Masahiro Ikeda, Kei Hagihara, Yoshihiro Sawano, Takuo Matsubara, Noboru Murata,Integral representation of shallow neural network that attains the global minimum.arXiv:1805.07517v2,2018
+    \bibitem{キー} S. Saitoh. Integral transforms, reproducing kernels and their applications. Addison Wesley Longman, 1997
+  
 \end{thebibliography}
 
 \end{document}
