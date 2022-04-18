@@ -16,9 +16,4 @@
   
 
 
-## 応援してくださる方
-　ぜひ投げ銭を  
-（ビットコイン）341wGT27XGfhecY8XUGLbRufLNJYbSEiGZ  
-（イーサリウム）0xb104ea4df402639ef269a811abbf006db6c09e6f  
-　気に入っていた仮想通貨「円天」はお亡くなりになられました。10万円ありがとう円天。確定申告でめっちゃ持っていかれたけど。  
-　円天死亡の経緯がわかりやすくまとまっているブログ→https://alis.to/serpenti/articles/375MXzQlq1rA
+
